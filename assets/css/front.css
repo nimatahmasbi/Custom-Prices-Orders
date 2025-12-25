@@ -1,0 +1,73 @@
+/* --- Global Styles --- */
+.cpo-table-responsive-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 20px; width: 100%; }
+body { font-family: sans-serif; } 
+
+/* --- جداول محصول --- */
+.cpo-products-list-container table.cpo-products-table { width: 100%; min-width: 600px; border-collapse: separate; border-spacing: 0; text-align: right; direction: rtl; border: none; font-size: 0.9em; }
+.cpo-products-list-container table.cpo-products-table thead { display: none; } 
+.cpo-products-list-container table.cpo-products-table tfoot { display: none; }
+.cpo-products-list-container table.cpo-products-table tbody tr { display: block; margin-bottom: 15px; background-color: #fff; border: 1px solid #eee; border-radius: 8px; padding: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.cpo-products-list-container table.cpo-products-table td { display: flex; justify-content: space-between; align-items: center; padding: 8px 5px; border-bottom: 1px dashed #f0f0f0; text-align: left !important; white-space: normal; }
+.cpo-products-list-container table.cpo-products-table td:last-child { border-bottom: none; }
+.cpo-products-list-container table.cpo-products-table td::before { content: attr(data-colname); font-weight: bold; color: #555; margin-left: 10px; text-align: right; white-space: nowrap; }
+
+/* Desktop View */
+@media (min-width: 768px) {
+    .cpo-products-list-container table.cpo-products-table { border-collapse: collapse; background: none; box-shadow: none; border-radius: 0; min-width: 700px; }
+    .cpo-products-list-container table.cpo-products-table thead { display: table-header-group; } 
+    .cpo-products-list-container table.cpo-products-table tbody tr { display: table-row; margin-bottom: 0; background-color: transparent; border: none; border-bottom: 1px solid #eee; padding: 0; box-shadow: none; }
+    .cpo-products-list-container table.cpo-products-table tbody tr:hover { background-color: #f1f1f1; }
+    .cpo-products-list-container table.cpo-products-table td { display: table-cell; padding: 10px 12px; border-bottom: 1px solid #eee; text-align: right !important; white-space: nowrap; vertical-align: middle; }
+    .cpo-products-list-container table.cpo-products-table th { background-color: #f8f8f8; font-weight: bold; white-space: nowrap; border-bottom: 1px solid #ddd;} 
+    .cpo-products-list-container table.cpo-products-table td::before { display: none; } 
+}
+
+.cpo-icon-btn { background: none; border: none; cursor: pointer; padding: 5px; display: inline-block; vertical-align: middle; line-height: 1; }
+.cpo-icon-btn img { width: 20px; height: 20px; opacity: 0.8; transition: opacity 0.2s; }
+.cpo-icon-btn:hover img { opacity: 1; }
+
+/* --- استایل پاپ‌آپ (Modal) --- */
+.cpo-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 10001; direction: rtl; overflow-y: auto; padding: 15px; box-sizing: border-box; }
+.cpo-modal-container { background-color: #fff; padding: 20px 25px; border-radius: 8px; width: 95%; max-width: 800px; position: relative; box-shadow: 0 5px 20px rgba(0,0,0,0.3); margin: auto; text-align: right; box-sizing: border-box; }
+.cpo-chart-container { max-width: 90%; width: 800px; }
+.cpo-chart-inner { width: 100%; min-height: 350px; height: 50vh; position: relative; }
+
+/* --- نوار ابزار نمودار (دکمه‌ها) --- */
+.cpo-chart-toolbar { margin-bottom: 15px; text-align: left; direction: ltr; }
+.cpo-chart-toolbar button { padding: 6px 14px; margin: 0 2px; border: 1px solid #ddd; background: #fff; cursor: pointer; border-radius: 4px; font-size: 13px; color: #555; }
+.cpo-chart-toolbar button.active { background: #0073aa; color: #fff; border-color: #0073aa; }
+.cpo-chart-toolbar button:hover { background: #f5f5f5; }
+.cpo-chart-toolbar .cpo-chart-download { background-color: #f0f0f0; font-weight: bold; margin-left: 10px; }
+
+/* واترمارک */
+.cpo-chart-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+canvas#cpoFrontPriceChart { position: relative; z-index: 1; }
+
+.cpo-modal-close { position: absolute; top: 8px; left: 8px; background: none; border: none; font-size: 26px; cursor: pointer; color: #aaa; line-height: 1; padding: 5px; }
+.cpo-modal-close:hover { color: #333; }
+.cpo-modal-container h3 { margin-top: 0; margin-bottom: 20px; color: #333; font-weight: 600; font-size: 1.3em; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+
+/* فرم‌ها */
+.cpo-form-field { margin-bottom: 15px; }
+.cpo-form-field label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9em; color: #555; }
+.cpo-form-field input[type="text"], .cpo-form-field input[type="tel"], .cpo-form-field textarea { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 1em; background-color: #fdfdfd; }
+.cpo-form-field input[type="tel"].ltr, .cpo-form-field input#captcha_input.ltr { direction: ltr; text-align: left; }
+.cpo-form-field textarea { min-height: 60px; }
+.cpo-form-field button[type="submit"] { width: 100%; padding: 12px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-size: 1em; cursor: pointer; transition: background-color 0.2s; font-weight: bold; }
+.cpo-form-field button[type="submit"]:hover { background-color: #218838; }
+.cpo-form-message { padding: 10px 15px; margin-bottom: 15px; border-radius: 4px; text-align: center; font-size: 0.95em; }
+.cpo-success { background-color: #d4edda; color: #155724; border-color: #c3e6cb;}
+.cpo-error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb;}
+.chart-error, .chart-loading { text-align: center; padding: 20px; color: #721c24; }
+
+/* کپچا */
+.cpo-captcha-wrap { display: flex; align-items: stretch; gap: 8px; flex-wrap: nowrap; }
+.cpo-captcha-code { background-color: #f0f0f0; padding: 0 10px; border-radius: 4px; font-weight: bold; font-size: 1.3em; letter-spacing: 5px; border: 1px solid #ccc; min-width: 90px; text-align: center; line-height: 38px; user-select: none; }
+.cpo-refresh-captcha { background: #eee; border: 1px solid #ccc; font-size: 1.5em; cursor: pointer; padding: 0 8px; line-height: 1; border-radius: 4px; height: 38px; }
+#captcha_input { width: 100px !important; text-align: center; letter-spacing: 3px; font-size: 1.2em; height: 38px; }
+
+@media (max-width: 768px) {
+    .cpo-modal-container { padding: 15px 20px; }
+    .cpo-chart-toolbar button { padding: 4px 8px; font-size: 11px; margin: 0 1px; }
+    .cpo-chart-inner { min-height: 250px; height: 40vh; }
+}
