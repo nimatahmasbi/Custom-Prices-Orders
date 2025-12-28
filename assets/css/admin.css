@@ -1,0 +1,249 @@
+/* admin.css */
+.cpo-accordion-header {
+    background-color: #f1f1f1;
+    color: #444;
+    cursor: pointer;
+    padding: 15px 18px;
+    width: 100%;
+    border: none;
+    text-align: right;
+    outline: none;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    border-radius: 4px;
+    margin-top: 10px;
+    font-weight: bold;
+    box-sizing: border-box;
+}
+
+.cpo-accordion-header:hover {
+    background-color: #e0e0e0;
+}
+
+.cpo-accordion-header.active {
+    background-color: #ddd;
+}
+
+.cpo-accordion-content {
+    padding: 15px 18px;
+    background-color: white;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    margin-bottom: 20px;
+}
+
+.cpo-quick-edit,
+.cpo-quick-edit-select {
+    cursor: pointer;
+    padding: 8px !important;
+}
+
+.cpo-quick-edit:hover,
+.cpo-quick-edit-select:hover {
+    background-color: #fcf8e3;
+}
+
+.cpo-quick-edit.editing,
+.cpo-quick-edit-select.editing,
+td.editing-td {
+    padding: 2px !important;
+}
+
+.cpo-quick-edit-input {
+    box-sizing: border-box;
+    width: 100%;
+    border: 1px solid #8cc1e9;
+    padding: 6px 8px;
+    margin: 0;
+    line-height: 1.4;
+    min-height: 30px;
+    font-size: inherit;
+    box-shadow: 0 0 0 1px #8cc1e9;
+}
+
+.cpo-quick-edit textarea.cpo-quick-edit-input {
+    min-height: 80px;
+}
+
+.cpo-quick-edit-buttons {
+    margin-top: 5px;
+}
+
+.cpo-quick-edit-buttons button {
+    margin-left: 5px;
+}
+
+td.editing-td input.small-text {
+    width: calc(50% - 10px);
+    display: inline-block;
+}
+
+.cpo-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    direction: rtl;
+}
+
+.cpo-modal-container {
+    background-color: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    margin: auto;
+    text-align: right;
+    box-sizing: border-box;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.cpo-close-modal {
+    position: absolute;
+    top: 10px;
+    left: 15px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #888;
+    line-height: 1;
+}
+
+.cpo-close-modal:hover {
+    color: #d00;
+}
+
+.cpo-modal-container h2 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+}
+
+.cpo-chart-modal-content {
+    position: relative;
+    width: 100%;
+    height: 350px;
+}
+
+.cpo-chart-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+canvas#cpoPriceChart {
+    position: relative;
+    z-index: 1;
+}
+
+.cpo-chart-toolbar {
+    margin-bottom: 10px;
+    direction: ltr;
+    text-align: left;
+}
+
+.cpo-chart-toolbar button {
+    padding: 5px 12px;
+    margin: 0 2px;
+    border: 1px solid #ccc;
+    background: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.cpo-chart-toolbar button.active {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.cpo-chart-toolbar button:hover {
+    background: #f0f0f0;
+}
+
+.cpo-image-preview img {
+    border: 1px solid #ddd;
+    padding: 3px;
+    max-height: 50px;
+    width: auto;
+}
+
+.cpo-settings-wrap .nav-tab-wrapper {
+    margin-bottom: 0;
+}
+
+.cpo-settings-wrap form {
+    background: #fff;
+    padding: 20px;
+    border: 1px solid #ccd0d4;
+    border-top: none;
+}
+
+.cpo-orders-table-wrapper {
+    overflow-x: auto;
+}
+
+.wp-list-table.cpo-orders-table {
+    border: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    margin-top: 1em;
+}
+
+.wp-list-table.cpo-orders-table td {
+    border: none;
+    padding: 10px 12px;
+    vertical-align: middle;
+}
+
+.wp-list-table.cpo-orders-table tbody tr {
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+@media screen and (max-width: 782px) {
+    .wp-list-table.cpo-orders-table thead {
+        display: none;
+    }
+
+    .wp-list-table.cpo-orders-table tr {
+        display: block;
+        margin-bottom: 15px;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+    }
+
+    .wp-list-table.cpo-orders-table td {
+        display: block;
+        text-align: right !important;
+        padding-left: 50%;
+        position: relative;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .wp-list-table.cpo-orders-table td::before {
+        content: attr(data-colname);
+        position: absolute;
+        left: auto;
+        right: 10px;
+        font-weight: bold;
+        color: #555;
+    }
+}
