@@ -131,6 +131,64 @@ td.editing-td input.small-text {
     padding-bottom: 15px;
 }
 
+/* --- استایل‌های جدید برای دیت‌پیکر و صفحه‌بندی --- */
+
+/* رفع مشکل نمایش دیت‌پیکر زیر مودال */
+.datepicker-plot-area {
+    z-index: 9999999 !important;
+    font-family: inherit;
+}
+
+/* تولبار بالای جدول */
+.cpo-table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    background: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+/* صفحه‌بندی */
+.cpo-pagination {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    direction: ltr; /* برای چیدمان صحیح دکمه‌ها */
+}
+
+.cpo-pagination button {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 3px;
+    min-width: 30px;
+    transition: all 0.2s;
+}
+
+.cpo-pagination button:hover {
+    background: #f0f0f0;
+}
+
+.cpo-pagination button.active {
+    background: #0073aa;
+    color: #fff;
+    border-color: #0073aa;
+}
+
+.cpo-pagination button:disabled {
+    opacity: 0.5;
+    cursor: default;
+    background: #eee;
+}
+
+/* -------------------------------------------------- */
+
 .cpo-chart-modal-content {
     position: relative;
     width: 100%;
