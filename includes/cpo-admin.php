@@ -12,6 +12,12 @@ function cpo_admin_assets($hook) {
     wp_enqueue_media();
     wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js', [], null, true);
     
+    // --- افزودن کتابخانه‌های تقویم شمسی (CDN) ---
+    wp_enqueue_style('persian-datepicker-css', 'https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css');
+    wp_enqueue_script('persian-date-js', 'https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js', [], null, true);
+    wp_enqueue_script('persian-datepicker-js', 'https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js', ['jquery', 'persian-date-js'], null, true);
+    // ------------------------------------------
+
     // توجه: نام فایل JS همان admin.js باقی مانده است
     wp_enqueue_script('cpo-admin-js', CPO_ASSETS_URL . 'js/admin.js', ['jquery', 'wp-i18n', 'chart-js', 'wp-util'], CPO_VERSION, true);
 
@@ -213,9 +219,11 @@ function cpo_fetch_price_history() {
             <h4 style="margin-top:0;"><?php _e('افزودن قیمت جا افتاده / جدید', 'cpo-full'); ?></h4>
             <form id="cpo-add-history-form" style="display:flex; gap:10px; align-items:flex-end; flex-wrap:wrap;">
                 <input type="hidden" name="product_id" value="<?php echo $pid; ?>">
-                <div>
+                
+                <div style="width: 180px;">
                     <label style="font-size:12px;"><?php _e('تاریخ و زمان', 'cpo-full'); ?></label><br>
-                    <input type="datetime-local" name="change_time" required style="direction:ltr;">
+                    <input type="text" class="cpo-persian-date-input regular-text" style="width:100%; text-align:center;" autocomplete="off" placeholder="انتخاب تاریخ">
+                    <input type="hidden" name="change_time" id="cpo-real-date-input">
                 </div>
                 <div>
                     <label style="font-size:12px;"><?php _e('قیمت پایه', 'cpo-full'); ?></label><br>
@@ -284,18 +292,18 @@ function cpo_add_history_record() {
     
     global $wpdb;
     $pid = intval($_POST['product_id']);
-    $time = sanitize_text_field($_POST['change_time']); // فرمت: YYYY-MM-DDTHH:MM
     
+    // دریافت تاریخ از فیلد مخفی (که توسط دیت‌پیکر به میلادی تبدیل شده است)
+    $time = sanitize_text_field($_POST['change_time']); 
+    
+    // اگر کاربر تاریخی انتخاب نکرده باشد، زمان فعلی درج شود
     if (empty($time)) {
-        wp_send_json_error(['message' => 'تاریخ الزامی است']);
+        $time = current_time('mysql', 1);
     }
-
-    // تبدیل فرمت HTML5 به MySQL
-    $time = str_replace('T', ' ', $time) . ':00'; 
 
     $wpdb->insert(CPO_DB_PRICE_HISTORY, [
         'product_id' => $pid,
-        'change_time' => $time,
+        'change_time' => $time, // فرمت صحیح: YYYY-MM-DD HH:MM:SS
         'price' => sanitize_text_field($_POST['price']),
         'min_price' => sanitize_text_field($_POST['min_price']),
         'max_price' => sanitize_text_field($_POST['max_price'])
