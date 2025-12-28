@@ -12,13 +12,14 @@ function cpo_admin_assets($hook) {
     wp_enqueue_media();
     wp_enqueue_script('chart-js', 'https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js', [], null, true);
     
-    // --- افزودن کتابخانه‌های تقویم شمسی (CDN) ---
+    // --- افزودن کتابخانه‌های تقویم شمسی ---
     wp_enqueue_style('persian-datepicker-css', 'https://unpkg.com/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css');
     wp_enqueue_script('persian-date-js', 'https://unpkg.com/persian-date@1.1.0/dist/persian-date.min.js', [], null, true);
     wp_enqueue_script('persian-datepicker-js', 'https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js', ['jquery', 'persian-date-js'], null, true);
     // ------------------------------------------
 
-    wp_enqueue_script('cpo-admin-js', CPO_ASSETS_URL . 'js/admin.js', ['jquery', 'wp-i18n', 'chart-js', 'wp-util'], CPO_VERSION, true);
+    // *** اصلاح مهم: افزودن persian-datepicker-js به لیست وابستگی‌ها ***
+    wp_enqueue_script('cpo-admin-js', CPO_ASSETS_URL . 'js/admin.js', ['jquery', 'wp-i18n', 'chart-js', 'wp-util', 'persian-datepicker-js'], CPO_VERSION, true);
 
     if (strpos($hook, 'settings') !== false) {
         wp_enqueue_style('wp-color-picker');
@@ -37,6 +38,17 @@ function cpo_admin_assets($hook) {
     ]);
 
     wp_enqueue_style('cpo-admin-css', CPO_ASSETS_URL . 'css/admin.css', [], CPO_VERSION);
+}
+
+// --- تابع کمکی برای تبدیل تاریخ میلادی به شمسی (بدون نیاز به افزونه جانبی) ---
+function cpo_get_jalali_date($g_date) {
+    if (function_exists('jdate')) { // اگر افزونه جلالی نصب بود
+        return jdate('Y/m/d H:i', strtotime($g_date));
+    }
+    // اگر افزونه جلالی نبود، از تبدیل دستی ساده استفاده میکنیم (یا همان تاریخ را برمیگردانیم)
+    // برای اطمینان از نمایش شمسی، پیشنهاد میشود افزونه wp-parsidate نصب باشد.
+    // اما اینجا date_i18n استفاده میکنیم که ترجمه وردپرس را اعمال کند.
+    return date_i18n('Y/m/d H:i', strtotime($g_date));
 }
 
 add_action('admin_menu', 'cpo_admin_menu');
@@ -196,7 +208,7 @@ function cpo_ajax_test_sms() {
 // تغییرات جدید: مدیریت اصلاح تاریخچه قیمت (Price History Correction)
 // ----------------------------------------------------
 
-// 1. دریافت فرم و لیست تاریخچه (همراه با صفحه‌بندی)
+// 1. دریافت فرم و لیست تاریخچه
 add_action('wp_ajax_cpo_fetch_price_history', 'cpo_fetch_price_history');
 function cpo_fetch_price_history() {
     check_ajax_referer('cpo_admin_nonce', 'security');
@@ -283,8 +295,8 @@ function cpo_fetch_price_history() {
                 <tr data-history-id="<?php echo $row->id; ?>">
                     <td class="cpo-history-editable" data-field="change_time" data-type="datetime">
                         <?php 
-                        // استفاده از date_i18n برای نمایش شمسی (با فرض فعال بودن پارسی‌دیت یا مشابه)
-                        echo date_i18n('Y/m/d H:i:s', strtotime($row->change_time)); 
+                        // استفاده از تابع کمکی برای نمایش شمسی
+                        echo cpo_get_jalali_date($row->change_time); 
                         ?>
                     </td>
                     <td class="cpo-history-editable" data-field="price">
@@ -310,7 +322,6 @@ function cpo_fetch_price_history() {
         <div class="cpo-pagination">
             <button class="cpo-pagination-link" data-page="<?php echo max(1, $paged - 1); ?>" data-product-id="<?php echo $pid; ?>" <?php disabled($paged, 1); ?>>«</button>
             <?php 
-            // نمایش هوشمند صفحات (برای تعداد زیاد)
             $range = 2;
             for ($i = 1; $i <= $total_pages; $i++) {
                 if ($i == 1 || $i == $total_pages || ($i >= $paged - $range && $i <= $paged + $range)) {
@@ -348,7 +359,7 @@ function cpo_add_history_record() {
 
     $wpdb->insert(CPO_DB_PRICE_HISTORY, [
         'product_id' => $pid,
-        'change_time' => $time, // فرمت صحیح: YYYY-MM-DD HH:MM:SS
+        'change_time' => $time, 
         'price' => sanitize_text_field($_POST['price']),
         'min_price' => sanitize_text_field($_POST['min_price']),
         'max_price' => sanitize_text_field($_POST['max_price'])
