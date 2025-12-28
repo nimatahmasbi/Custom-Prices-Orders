@@ -18,7 +18,6 @@ function cpo_admin_assets($hook) {
     wp_enqueue_script('persian-datepicker-js', 'https://unpkg.com/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js', ['jquery', 'persian-date-js'], null, true);
     // ------------------------------------------
 
-    // توجه: نام فایل JS همان admin.js باقی مانده است
     wp_enqueue_script('cpo-admin-js', CPO_ASSETS_URL . 'js/admin.js', ['jquery', 'wp-i18n', 'chart-js', 'wp-util'], CPO_VERSION, true);
 
     if (strpos($hook, 'settings') !== false) {
@@ -197,7 +196,7 @@ function cpo_ajax_test_sms() {
 // تغییرات جدید: مدیریت اصلاح تاریخچه قیمت (Price History Correction)
 // ----------------------------------------------------
 
-// 1. دریافت فرم و لیست تاریخچه
+// 1. دریافت فرم و لیست تاریخچه (همراه با صفحه‌بندی)
 add_action('wp_ajax_cpo_fetch_price_history', 'cpo_fetch_price_history');
 function cpo_fetch_price_history() {
     check_ajax_referer('cpo_admin_nonce', 'security');
@@ -207,8 +206,17 @@ function cpo_fetch_price_history() {
     $pid = intval($_GET['product_id']);
     $product = $wpdb->get_row($wpdb->prepare("SELECT name FROM ".CPO_DB_PRODUCTS." WHERE id=%d", $pid));
     
-    // دریافت تاریخچه به ترتیب نزولی (جدیدترین اول)
-    $history = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".CPO_DB_PRICE_HISTORY." WHERE product_id=%d ORDER BY change_time DESC", $pid));
+    // --- منطق صفحه‌بندی ---
+    $paged = isset($_GET['paged']) ? max(1, intval($_GET['paged'])) : 1;
+    $per_page = isset($_GET['per_page']) ? intval($_GET['per_page']) : 10;
+    $offset = ($paged - 1) * $per_page;
+    
+    // شمارش کل رکوردها
+    $total_items = $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM ".CPO_DB_PRICE_HISTORY." WHERE product_id=%d", $pid));
+    $total_pages = ceil($total_items / $per_page);
+    
+    // دریافت رکوردها با LIMIT و OFFSET
+    $history = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".CPO_DB_PRICE_HISTORY." WHERE product_id=%d ORDER BY change_time DESC LIMIT %d OFFSET %d", $pid, $per_page, $offset));
     
     ob_start();
     ?>
@@ -225,6 +233,7 @@ function cpo_fetch_price_history() {
                     <input type="text" class="cpo-persian-date-input regular-text" style="width:100%; text-align:center;" autocomplete="off" placeholder="انتخاب تاریخ">
                     <input type="hidden" name="change_time" id="cpo-real-date-input">
                 </div>
+
                 <div>
                     <label style="font-size:12px;"><?php _e('قیمت پایه', 'cpo-full'); ?></label><br>
                     <input type="text" name="price" class="small-text" placeholder="0">
@@ -243,6 +252,20 @@ function cpo_fetch_price_history() {
             </form>
         </div>
 
+        <div class="cpo-table-toolbar">
+            <div class="cpo-pagination-info">
+                <?php printf(__('نمایش %s تا %s از %s رکورد', 'cpo-full'), number_format_i18n($offset + 1), number_format_i18n(min($offset + $per_page, $total_items)), number_format_i18n($total_items)); ?>
+            </div>
+            <div class="cpo-per-page-selector">
+                <label><?php _e('تعداد نمایش:', 'cpo-full'); ?></label>
+                <select class="cpo-per-page-select" data-product-id="<?php echo $pid; ?>">
+                    <?php foreach([10, 25, 50, 100, 200, 500] as $num): ?>
+                        <option value="<?php echo $num; ?>" <?php selected($per_page, $num); ?>><?php echo $num; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+        </div>
+
         <div class="notice notice-info inline" style="margin-bottom: 10px;"><p><?php _e('برای ویرایش مقادیر، روی سلول‌ها **دوبار کلیک** کنید.', 'cpo-full'); ?></p></div>
 
         <table class="wp-list-table widefat fixed striped">
@@ -258,8 +281,11 @@ function cpo_fetch_price_history() {
             <tbody>
                 <?php if($history): foreach($history as $row): ?>
                 <tr data-history-id="<?php echo $row->id; ?>">
-                    <td class="cpo-history-editable" data-field="change_time" data-type="datetime" style="direction:ltr; text-align:left;">
-                        <?php echo $row->change_time; ?>
+                    <td class="cpo-history-editable" data-field="change_time" data-type="datetime">
+                        <?php 
+                        // استفاده از date_i18n برای نمایش شمسی (با فرض فعال بودن پارسی‌دیت یا مشابه)
+                        echo date_i18n('Y/m/d H:i:s', strtotime($row->change_time)); 
+                        ?>
                     </td>
                     <td class="cpo-history-editable" data-field="price">
                         <?php echo number_format((float)str_replace(',','',$row->price)); ?>
@@ -279,6 +305,26 @@ function cpo_fetch_price_history() {
                 <?php endif; ?>
             </tbody>
         </table>
+
+        <?php if($total_pages > 1): ?>
+        <div class="cpo-pagination">
+            <button class="cpo-pagination-link" data-page="<?php echo max(1, $paged - 1); ?>" data-product-id="<?php echo $pid; ?>" <?php disabled($paged, 1); ?>>«</button>
+            <?php 
+            // نمایش هوشمند صفحات (برای تعداد زیاد)
+            $range = 2;
+            for ($i = 1; $i <= $total_pages; $i++) {
+                if ($i == 1 || $i == $total_pages || ($i >= $paged - $range && $i <= $paged + $range)) {
+                    $active = ($i == $paged) ? 'active' : '';
+                    echo '<button class="cpo-pagination-link '.$active.'" data-page="'.$i.'" data-product-id="'.$pid.'">'.$i.'</button>';
+                } elseif ($i == $paged - $range - 1 || $i == $paged + $range + 1) {
+                    echo '<span>...</span>';
+                }
+            }
+            ?>
+            <button class="cpo-pagination-link" data-page="<?php echo min($total_pages, $paged + 1); ?>" data-product-id="<?php echo $pid; ?>" <?php disabled($paged, $total_pages); ?>>»</button>
+        </div>
+        <?php endif; ?>
+
     </div>
     <?php
     wp_send_json_success(['html' => ob_get_clean()]);
@@ -296,7 +342,6 @@ function cpo_add_history_record() {
     // دریافت تاریخ از فیلد مخفی (که توسط دیت‌پیکر به میلادی تبدیل شده است)
     $time = sanitize_text_field($_POST['change_time']); 
     
-    // اگر کاربر تاریخی انتخاب نکرده باشد، زمان فعلی درج شود
     if (empty($time)) {
         $time = current_time('mysql', 1);
     }
@@ -326,7 +371,6 @@ function cpo_update_history_cell() {
     // لیست فیلدهای مجاز
     if(!in_array($field, ['price', 'min_price', 'max_price', 'change_time'])) wp_send_json_error();
 
-    // حذف کاما از قیمت‌ها برای ذخیره صحیح
     if($field !== 'change_time') {
         $value = str_replace(',', '', $value);
     }
