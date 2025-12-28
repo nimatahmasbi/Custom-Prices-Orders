@@ -133,10 +133,11 @@ td.editing-td input.small-text {
 
 /* --- استایل‌های جدید برای دیت‌پیکر و صفحه‌بندی --- */
 
-/* رفع مشکل نمایش دیت‌پیکر زیر مودال */
+/* رفع مشکل باز نشدن تقویم (نمایش روی مدال) */
 .datepicker-plot-area {
-    z-index: 9999999 !important;
+    z-index: 99999999 !important; /* بسیار بالا */
     font-family: inherit;
+    position: absolute;
 }
 
 /* تولبار بالای جدول */
