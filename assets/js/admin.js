@@ -388,6 +388,19 @@ jQuery(document).ready(function ($) {
         }).done(function (res) {
             if (res.success) {
                 modal.find('.cpo-history-content').html(res.data.html);
+
+                // --- فعال‌سازی دیت پیکر شمسی ---
+                if ($.fn.pDatepicker) {
+                    $('.cpo-persian-date-input').pDatepicker({
+                        format: 'YYYY/MM/DD HH:mm', // فرمت نمایش
+                        timePicker: { enabled: true, step: 1 },
+                        altField: '#cpo-real-date-input', // آیدی اینپوت مخفی
+                        altFormat: 'YYYY-MM-DD HH:mm:ss', // فرمت ذخیره سازی (میلادی)
+                        initialValue: true,
+                        autoClose: true
+                    });
+                }
+                // --------------------------------
             } else {
                 modal.find('.cpo-history-content').html('<p style="color:red; text-align:center;">خطا در دریافت اطلاعات</p>');
             }
