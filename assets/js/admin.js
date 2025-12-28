@@ -57,6 +57,7 @@ jQuery(document).ready(function ($) {
     // --- ویرایش سریع (Quick Edit) - لیست محصولات اصلی ---
     $(document).on('dblclick', '.cpo-quick-edit, .cpo-quick-edit-select', function () {
         var cell = $(this);
+        // جلوگیری از تداخل با ویرایشگر تاریخچه
         if (cell.hasClass('editing') || cell.closest('td').hasClass('editing-td')) return;
 
         var id = cell.data('id');
@@ -106,7 +107,6 @@ jQuery(document).ready(function ($) {
         cell.find('input, select, textarea').first().focus();
 
         btn_save.on('click', function () {
-            // ... (Logic remains same for main table save) ...
             if (field === 'min_price' || field === 'max_price') {
                 var new_min = cell.find('input[data-field="min_price"]').val();
                 var new_max = cell.find('input[data-field="max_price"]').val();
@@ -156,13 +156,18 @@ jQuery(document).ready(function ($) {
         var product_id = $(this).data('product-id');
 
         if ($('#cpo-chart-modal').length === 0) {
-             var modalHTML = '<div id="cpo-chart-modal" class="cpo-modal-overlay" style="display:none;">' +
+            var modalHTML =
+                '<div id="cpo-chart-modal" class="cpo-modal-overlay" style="display:none;">' +
                 '<div class="cpo-modal-container cpo-chart-background">' +
                 '<span class="cpo-close-modal">×</span>' +
                 '<h2>نمودار تغییرات قیمت</h2>' +
                 '<div class="cpo-chart-toolbar">' +
                 '<button class="button cpo-chart-filter active" data-range="all">همه</button> ' +
-                // ... (Buttons) ...
+                '<button class="button cpo-chart-filter" data-range="12">۱ سال</button> ' +
+                '<button class="button cpo-chart-filter" data-range="6">۶ ماه</button> ' +
+                '<button class="button cpo-chart-filter" data-range="3">۳ ماه</button> ' +
+                '<button class="button cpo-chart-filter" data-range="1">۱ ماه</button> ' +
+                '<button class="button cpo-chart-filter" data-range="0.25">۱ هفته</button> ' +
                 '<button class="button button-primary cpo-chart-download">دانلود نمودار</button>' +
                 '</div>' +
                 '<div class="cpo-chart-modal-content">' +
@@ -214,8 +219,7 @@ jQuery(document).ready(function ($) {
             modal.hide();
         });
     });
-    
-    // ... (Chart Filter and Download functions - kept same) ...
+
     $(document).on('click', '.cpo-chart-filter', function () {
         $('.cpo-chart-filter').removeClass('active');
         $(this).addClass('active');
@@ -243,12 +247,12 @@ jQuery(document).ready(function ($) {
                 labels = labels.slice(start); prices = prices.slice(start); min_prices = min_prices.slice(start); max_prices = max_prices.slice(start);
             }
         }
-        // ... (Chart Dataset Logic - kept same) ...
+
         var isSinglePrice = true;
         if (min_prices && max_prices && min_prices.length > 0) {
-             for (var i = 0; i < min_prices.length; i++) {
-                 if (min_prices[i] !== max_prices[i] && min_prices[i] !== null && max_prices[i] !== null) { isSinglePrice = false; break; }
-             }
+            for (var i = 0; i < min_prices.length; i++) {
+                if (min_prices[i] !== max_prices[i] && min_prices[i] !== null && max_prices[i] !== null) { isSinglePrice = false; break; }
+            }
         } else { isSinglePrice = false; }
 
         var datasets = [];
@@ -272,7 +276,6 @@ jQuery(document).ready(function ($) {
         });
     }
 
-
     // --- سایر پاپ‌آپ‌ها ---
     $(document).on('click', '.cpo-close-modal, .cpo-modal-overlay', function (e) {
         if (e.target === this || $(this).hasClass('cpo-close-modal')) {
@@ -281,7 +284,6 @@ jQuery(document).ready(function ($) {
         }
     });
 
-    // ... (Edit modals - kept same) ...
     $(document).on('click', '.cpo-edit-button, .cpo-edit-cat-button', function (e) {
         e.preventDefault();
         var btn = $(this);
@@ -335,7 +337,7 @@ jQuery(document).ready(function ($) {
             btn.prop('disabled', false).val(cpo_admin_vars.i18n.save);
         });
     });
-    
+
     $('#cpo-test-email-btn, #cpo-test-sms-btn').click(function () {
         var btn = $(this);
         var log_area = btn.siblings('textarea');
