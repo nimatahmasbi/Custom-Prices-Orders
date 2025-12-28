@@ -24,13 +24,24 @@ class CPO_Core {
     }
 
     public static function save_price_history($pid, $val, $field='price') {
-        global $wpdb; $pid = intval($pid); if(!$pid) return false;
+        global $wpdb; 
+        $pid = intval($pid); 
+        if(!$pid) return false;
+
+        // دریافت مقادیر فعلی از دیتابیس برای مقایسه
         $cur = $wpdb->get_row($wpdb->prepare("SELECT price, min_price, max_price FROM ".CPO_DB_PRODUCTS." WHERE id=%d", $pid));
         if(!$cur) return false;
         
         $p = ($field==='price') ? $val : $cur->price;
         $min = ($field==='min_price') ? $val : $cur->min_price;
         $max = ($field==='max_price') ? $val : $cur->max_price;
+
+        // --- اصلاح: بررسی تکراری بودن ---
+        // اگر مقادیر جدید دقیقاً همان مقادیر قبلی هستند، ذخیره نکن
+        if ($p == $cur->price && $min == $cur->min_price && $max == $cur->max_price) {
+            return false;
+        }
+        // --------------------------------
 
         $wpdb->insert(CPO_DB_PRICE_HISTORY, ['product_id'=>$pid, 'change_time'=>current_time('mysql',1), 'price'=>$p, 'min_price'=>$min, 'max_price'=>$max]);
         $wpdb->update(CPO_DB_PRODUCTS, ['last_updated_at'=>current_time('mysql',1)], ['id'=>$pid]);
@@ -91,13 +102,8 @@ function cpo_ajax_get_captcha() {
     check_ajax_referer('cpo_front_nonce','nonce');
     
     $code = rand(1000, 9999);
-    // ساخت یک کلید منحصر به فرد برای هر درخواست کپچا
     $key = md5(microtime() . rand());
-    
-    // ذخیره در Transient برای ۱۰ دقیقه
     set_transient('cpo_captcha_' . $key, (string)$code, 10 * 60);
-    
-    // ارسال کد (برای نمایش) و کلید (برای ارسال مخفی در فرم)
     wp_send_json_success(['code'=>(string)$code, 'key'=>$key]); 
 }
 
@@ -118,7 +124,6 @@ add_action('wp_ajax_nopriv_cpo_submit_order', 'cpo_submit_order');
 function cpo_submit_order() {
     check_ajax_referer('cpo_front_nonce','nonce'); 
     
-    // بررسی کپچا با استفاده از کلید و ترنزینت
     $input_captcha = isset($_POST['captcha_input']) ? $_POST['captcha_input'] : '';
     $captcha_key = isset($_POST['captcha_key']) ? $_POST['captcha_key'] : '';
     $real_captcha = get_transient('cpo_captcha_' . $captcha_key);
@@ -127,7 +132,6 @@ function cpo_submit_order() {
         wp_send_json_error(['message'=>'کد امنیتی اشتباه یا منقضی شده است', 'code'=>'captcha_error'], 400);
     }
     
-    // حذف کپچا بعد از استفاده موفق (یکبار مصرف)
     delete_transient('cpo_captcha_' . $captcha_key);
 
     global $wpdb; $pid = intval($_POST['product_id']);
